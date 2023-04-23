@@ -1,12 +1,14 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "kvlib.c"
+#include "kvlib.h"
 #define FILE_PATH "database.txt"
 
-void read_record(Record *one_record, FILE *fp);
-void write_record(const Record *one_record, FILE *fp);
-
+void read_record(Recordptr one_record, FILE *fp);
+void write_record(Recordptr recordptr, FILE *fp);
+void process_put(Databaseptr this_database, Command *command);
+Recordptr new_record_from_command(Command *command);
 
 Command 
 parse_command(char const *argv) {
@@ -36,18 +38,6 @@ parse_command(char const *argv) {
     return command;
 }
 
-
-
-
-
-void process_put(Database *this_database, Command *command) {
-    int key;
-    char *value;
-    
-}
-
-
-
 void
 process_one_command(Database *this_database, char const *argv) {
     Command command = parse_command(argv);
@@ -71,9 +61,64 @@ process_one_command(Database *this_database, char const *argv) {
     }
 }
 
-void process_get(Database *this_database, Command *command) {
-    this_database->values
+void 
+process_get(Database *this_database, Command *command) {
+    int max = this_database->length;
+    for (int i = 0; i < max; i++) {
+        Recordptr recordptr = this_database->records;
+        if (recordptr->deleted == false && command->key == recordptr->key) {
+            printf("value for %d is: %s", command->key, recordptr->value);
+            break;
+        }
+    }
+    printf("no record found for %d", command->key);
+} 
+
+
+void 
+process_put(Database *this_database, Command *command) {
+    int max = this_database->length;
+    for (int i = 0; i < max; i++) {
+        Recordptr recordptr = this_database->records;
+        if (command->key == recordptr->key) {
+            recordptr->deleted = true;
+            break;
+        }
+    }
+    Recordptr new_records = (Recordptr) realloc(this_database->records, this_database->length + 1);
+    if (new_records == NULL) {
+        return;
+    }
+    this_database->records = new_records;
+    Recordptr new_record = new_record_from_command(command);
+    if (new_record == NULL) {
+        return;
+    }
+    *(new_records + max) = *new_record;
+    return;
 }
+
+
+
+
+Recordptr 
+new_record_from_command(Command *command) {
+    Recordptr recordptr = malloc(sizeof(Record));
+    if (recordptr == NULL) {
+        return recordptr;
+    }
+    recordptr->deleted = false;
+    recordptr->key = command->key;
+    recordptr->length = strlen(command->value);
+    String string = malloc(sizeof(char) * (recordptr->length + 1));
+    if (string == NULL) {
+        free(recordptr);
+        return NULL;
+    }
+    recordptr->value = string;
+    return recordptr;
+}
+
 
 int 
 read_database(Database *this_database) {
@@ -82,12 +127,12 @@ read_database(Database *this_database) {
         return -1;
     }
     fread(&this_database->length, sizeof(this_database->length), 1, fp);
-    this_database->values = malloc(this_database->length * sizeof(Record));
-    if (this_database->values == NULL) {
+    this_database->records = malloc(this_database->length * sizeof(Record));
+    if (this_database->records == NULL) {
         return -1;
     }
     for (int i = 0; i < this_database->length; i++) {
-        read_record(this_database->values + i, fp);
+        read_record(this_database->records + i, fp);
     }
     return 0;
 }
@@ -100,13 +145,13 @@ write_database(Database *this_database) {
     }
     fwrite(&this_database->length, sizeof(this_database->length), 1, fp);
     for (int i = 0; i < this_database->length; i++) {
-        write_record(this_database->values + i, fp);
+        write_record(this_database->records + i, fp);
     }
 }
 
 
 void
-write_record(const Record *one_record, FILE *fp) {
+write_record(Record *one_record, FILE *fp) {
     if (fp == NULL) {
         return;
     }

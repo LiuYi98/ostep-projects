@@ -1,6 +1,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+typedef char *String;
+
 typedef struct {
   int key;
   size_t length;
@@ -8,10 +10,14 @@ typedef struct {
   bool deleted;
 } Record;
 
+typedef Record *Recordptr;
+
 typedef struct {
   size_t length;
-  Record *values;
+  Recordptr records;
 } Database;
+
+typedef Database *Databaseptr; ;
 
 typedef struct {
   char c;
