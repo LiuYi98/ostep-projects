@@ -36,32 +36,32 @@ read_record(Record *one, FILE *fp) {
 
 
 int 
-read_database(Database *this_database) {
+read_database(Databaseptr dbptr) {
     FILE *fp = fopen(FILE_PATH, "r");
     if (fp == NULL) {
         return -1;
     }
-    fread(&this_database->length, sizeof(this_database->length), 1, fp);
-    this_database->records = malloc(this_database->length * sizeof(Record));
-    if (this_database->records == NULL) {
+    fread(&dbptr->length, sizeof(dbptr->length), 1, fp);
+    dbptr->records = malloc(dbptr->length * sizeof(Record));
+    if (dbptr->records == NULL) {
         return -1;
     }
-    for (int i = 0; i < this_database->length; i++) {
-        read_record(this_database->records + i, fp);
+    for (int i = 0; i < dbptr->length; i++) {
+        read_record(dbptr->records + i, fp);
     }
     fclose(fp);
     return 0;
 }
 
 void 
-write_database(Database *this_database) {
+write_database(Databaseptr dbptr) {
     FILE *fp = fopen(FILE_PATH, "w");
     if (fp == NULL) {
         return;
     }
-    fwrite(&this_database->length, sizeof(this_database->length), 1, fp);
-    for (int i = 0; i < this_database->length; i++) {
-        write_record(this_database->records + i, fp);
+    fwrite(&dbptr->length, sizeof(dbptr->length), 1, fp);
+    for (int i = 0; i < dbptr->length; i++) {
+        write_record(dbptr->records + i, fp);
     }
     fclose(fp);
 }

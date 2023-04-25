@@ -1,6 +1,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#ifndef KVLIB_H
+
+#define KVLIB_H
+
 typedef char *String;
 
 typedef struct {
@@ -25,3 +29,5 @@ typedef struct {
   char *value;
 
 } Command;
+
+#endif

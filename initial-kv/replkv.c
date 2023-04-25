@@ -1,3 +1,4 @@
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,12 +13,12 @@ process_get(Databaseptr dbptr, Command *command) {
     Recordptr recordptr = dbptr->records;
     for (int i = 0; i < dbptr->length; i++) {
         if (recordptr->deleted == false && command->key == recordptr->key) {
-            printf("value for %d is: %s\n", command->key, recordptr->value);
+            printf("value for %d is: %s", command->key, recordptr->value);
             return;
         }
         recordptr++;
     }
-    printf("no record found for %d\n", command->key);
+    printf("no record found for %d", command->key);
 } 
 
 
@@ -37,7 +38,6 @@ process_put(Databaseptr dbptr, Command *command) {
     }
     dbptr->records = new_records;
     new_record_from_command(new_records + dbptr->length, command);
-    dbptr->length++;
     return;
 }
 
@@ -79,8 +79,12 @@ main(int argc, char const *argv[])
     if (dbptr == NULL) {
         return -1;
     } 
+    while (true) {
+        
+    }
+    printf("argc = %d\n", argc);
     for(int i = 1; i < argc; i++) {
-        printf("command: %s\n", argv[i]);
+        printf("%s\n", argv[i]);
         // printf("%c\n", command.c);
         // printf("%d\n", command.key);
         // printf("%s\n", command.value);
