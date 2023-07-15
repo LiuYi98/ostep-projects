@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_LINE_LENGTH 10000
 
 int main(int argc, char *argv[]) {
 
@@ -27,7 +26,6 @@ int main(int argc, char *argv[]) {
       }
       printf("%s", buffer);
     }
-    // printf("errno = %d\n", errno);
   }
   return EXIT_SUCCESS;
 }
