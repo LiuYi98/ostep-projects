@@ -81,9 +81,6 @@ main(int argc, char const *argv[])
     } 
     for(int i = 1; i < argc; i++) {
         printf("command: %s\n", argv[i]);
-        // printf("%c\n", command.c);
-        // printf("%d\n", command.key);
-        // printf("%s\n", command.value);
         process_one_command(dbptr, argv[i]);
     }
     write_database(dbptr);    
